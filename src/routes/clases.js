@@ -5,6 +5,7 @@ const methods = require('../controllers/clasesController');
 
 
 router.get('/clases/facultad/:email',methods.getDocenteFacultad);
+router.get('/clases/aula/:cod_facultad',methods.getAula);
 router.get('/clases/curso/:email&:cod_facultad',methods.getDocenteCurso);
 router.get('/clases/seccion/:email&:cod_facultad&:cod_curso',methods.getDocenteSeccion);
 router.get('/clases/semanas',methods.getSemanas);

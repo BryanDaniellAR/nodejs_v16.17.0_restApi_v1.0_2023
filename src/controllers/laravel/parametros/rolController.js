@@ -1,0 +1,90 @@
+const database= require('../../../database/database');
+
+const getRolAll  = async(req,res)=>{
+    const connection = await database.getConnection();
+    //const {email} = req.params;
+    const response = await connection.query(
+                                            `SELECT
+                                                tipo,
+                                                descripcion
+                                            FROM
+                                                tipo`
+                                            );
+    //let result = Object.values(JSON.parse(JSON.stringify(response)));
+    //console.log(response);
+    res.json(response);
+};
+const getRol  = async(req,res)=>{
+    const connection = await database.getConnection();
+    const {tipo} = req.params;
+    const response = await connection.query(
+                                            `SELECT
+                                                tipo,
+                                                descripcion
+                                            FROM
+                                                tipo
+                                            WHERE
+                                                tipo='${tipo}'`
+                                            );
+    //let result = Object.values(JSON.parse(JSON.stringify(response)));
+    //console.log(result);
+    res.json(response);
+};
+const postRol  = async(req,res)=>{
+    const connection = await database.getConnection();
+    const {tipo,descripcion} = req.body;
+    const response = await connection.query(
+                                            `INSERT INTO
+                                                tipo (tipo,descripcion)
+                                            VALUES ('${tipo}','${descripcion}')`
+                                            );
+    res.json(response);
+};
+const putRol = async(req,res)=>{
+    const connection = await database.getConnection();
+    const {tipo} = req.params;
+    const {descripcion} = req.body;
+    try{
+        const response = await connection.query(
+                                            `UPDATE
+                                                tipo
+                                            SET
+                                                descripcion = '${descripcion}'
+                                            WHERE
+                                                tipo='${tipo}'`
+                                            );
+        //const users = response.json();
+        //res.json({'response':[{'response':'Cerrado con éxito'}]});
+        res.json(response);
+    }catch(_){
+        //console.log(_);
+        res.json(_);
+    }
+};
+const deleteRol  = async(req,res)=>{
+    const connection = await database.getConnection();
+    const {tipo} = req.params;
+    try{
+        const response = await connection.query(
+                                            `DELETE FROM
+                                                tipo
+                                            WHERE
+                                                tipo = '${tipo}'`
+                                            );
+        //console.log(response);
+        res.json(response);
+    }catch(_){
+        //console.log(_);
+        res.json(_);
+    }
+};
+
+const methods = {
+    getRolAll,
+    getRol,
+    postRol,
+    putRol,
+    deleteRol
+};
+
+module.exports = methods;

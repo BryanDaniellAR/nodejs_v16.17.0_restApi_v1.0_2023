@@ -42,16 +42,22 @@ const getAsistenciaHoy  = async(req,res)=>{
                                                 orden_pedido e,
                                                 facultad f,
                                                 curso g,
-                                                aula h
+                                                aula h,
+                                                asistencia_habilitado i,
+                                                op_semana j
                                             WHERE
                                                 a.email = b.email AND
+                                                a.cod_asistencia_habilitado = i.cod_asistencia_habilitado AND
                                                 a.cod_oseccion = b.cod_oseccion AND
                                                 b.cod_oseccion = c.cod_oseccion AND
                                                 c.cod_ocurso = d.cod_ocurso AND
                                                 d.cod_op = e.cod_op AND
                                                 e.cod_facultad = f.cod_facultad AND
                                                 d.cod_curso = g.cod_curso AND
-                                                c.cod_aula = h.cod_aula AND
+                                                i.cod_aula = h.cod_aula AND
+                                                i.cod_op_semana = j.cod_op_semana AND
+                                                i.cod_oseccion = b.cod_oseccion AND
+                                                j.cod_op = e.cod_op AND
                                                 a.email = '${email}' AND
                                                 DATE_FORMAT(NOW(),"%d-%m-%Y") = DATE_FORMAT(a.fecha_created,"%d-%m-%Y")`
                                             );
@@ -127,7 +133,7 @@ const getOpcionesAsistencia  = async(req,res)=>{
                                                 a.cod_oseccion = b.cod_oseccion AND
                                                 b.habilitado = 0 AND
                                                 c.cod_oseccion = a.cod_oseccion AND
-                                                c.cod_aula = d.cod_aula AND
+                                                b.cod_aula = d.cod_aula AND
                                                 a.email='${email}' AND
                                                 a.cod_oseccion = ${cod_oseccion}  AND
                                                 NOT EXISTS
@@ -179,6 +185,7 @@ const postAsistencia = async(req,res)=>{
                                                         cod_asistencia_habilitado = ${cod_asistencia_habilitado} AND
                                                         cod_oseccion = ${cod_oseccion}`
                                                     );
+    
     if (asistencia_habilitado.length!=0){
         const hoy = new Date(Date.now());
         console.log(hoy.toLocaleString("es-PE"));
@@ -333,15 +340,22 @@ const postAsistenciaAlumno  = async(req,res)=>{
     const connection = await database.getConnection();
     //const {email} = req.params;
     const {cod_op_semana,email,cod_oseccion,cod_asistencia_habilitado,distancia} = req.body;
-    console.log(cod_op_semana,email,cod_oseccion,cod_asistencia_habilitado,distancia)
     const response_ = await connection.query(`SELECT
-                                                habilitado
+                                                b.habilitado
                                             from
-                                                asistencia_habilitado
+                                                op_semana a,
+                                                asistencia_habilitado b
                                             where
-                                                cod_op_semana = ${cod_op_semana} and 
-                                                cod_oseccion=${cod_oseccion} and
-                                                habilitado = 0`);
+                                                a.cod_op_semana = b.cod_op_semana AND
+                                                a.fecha_inicio<= NOW() AND
+                                                a.fecha_final>= NOW() AND
+                                                DATE_ADD(b.fecha_created,interval b.tiempo_cerrar_num_solicitud minute) >= (CASE
+                                                                                                                                WHEN b.tiempo_cerrar_num_solicitud = 0 THEN 0
+                                                                                                                                ELSE NOW()
+                                                                                                                            END) AND
+                                                b.cod_op_semana = ${cod_op_semana} AND 
+                                                b.cod_oseccion = ${cod_oseccion} AND
+                                                b.habilitado = 0`);
     if(response_.length !=0){
         const response = await connection.query(
                                                 `INSERT INTO
@@ -355,9 +369,9 @@ const postAsistenciaAlumno  = async(req,res)=>{
                                                         ${distancia}
                                                     )`
                                                 );
-        res.json({'response':[{'response':'Creado con éxito.'}]});
+        res.json(response);
     }else{
-        res.json({'response':[{'response':'El tiempo para marcar asistencia ya termino'}]});
+        res.json({'response':'Ya no puede marcar asistencia, el tiempo para marcar asistencia ya termino.'});
     };
 };
 

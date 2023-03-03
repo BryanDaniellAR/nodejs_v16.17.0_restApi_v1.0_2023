@@ -122,7 +122,7 @@ const getClasesDocenteSemanaReporte  = async(req,res)=>{
 };
 const postHabilitarClaseSemana = async(req,res)=>{
     const connection = await database.getConnection();
-    const {cod_op_semana,cod_oseccion,email,distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
+    const {cod_op_semana,cod_oseccion,cod_aula,distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
     const num_solicitud = await connection.query(
                                             `SELECT
                                                 count(*)+1 'num_solicitud'
@@ -130,8 +130,7 @@ const postHabilitarClaseSemana = async(req,res)=>{
                                                 asistencia_habilitado
                                             WHERE
                                                 cod_op_semana=${cod_op_semana} AND
-                                                cod_oseccion = ${cod_oseccion} AND
-                                                email='${email}'`
+                                                cod_oseccion = ${cod_oseccion}`
                                             );
     const habilitado = await connection.query(
                                             `SELECT
@@ -141,37 +140,42 @@ const postHabilitarClaseSemana = async(req,res)=>{
                                             WHERE
                                                 cod_op_semana=${cod_op_semana} AND
                                                 cod_oseccion = ${cod_oseccion} AND
-                                                email='${email}' AND
                                                 habilitado = 0`
                                             );
-    if (habilitado.length===0){
-        const response = await connection.query(
-                                                `INSERT INTO asistencia_habilitado 
-                                                (cod_op_semana,cod_oseccion,num_solicitud,distancia_maxima,tiempo_cerrar_num_solicitud,email) VALUES 
-                                                (${cod_op_semana},${cod_oseccion},${num_solicitud[0].num_solicitud},'${distancia_maxima}','${tiempo_cerrar_num_solicitud}','${email}')`
+    const semana_disponible = await connection.query(
+                                                `SELECT
+                                                    1
+                                                FROM
+                                                    op_semana a
+                                                WHERE
+                                                    a.fecha_inicio<= NOW() AND
+                                                    a.fecha_final>= NOW() AND
+                                                    a.cod_op_semana = ${cod_op_semana}`
                                                 );
-        /*const response_ = await connection.query(
-            `SELECT
-                cod_asistencia_habilitado,
-                num_solicitud,
-                distancia_maxima,
-                tiempo_cerrar_num_solicitud,
-                habilitado
-            FROM
-                asistencia_habilitado a
-            WHERE
-                a.cod_op_semana=${cod_op_semana} AND
-                a.cod_oseccion = ${cod_oseccion} AND
-                a.email='${email}' 
-            ORDER BY
-                a.num_solicitud DESC`
-            );
-        res.json(response_[0]);*/
+    if(semana_disponible.length!=0){
+        //FUNCIONA CON JOBS AL SEGUNDO
+        /*if (habilitado.length===0){
+            const response = await connection.query(
+                                                    `INSERT INTO asistencia_habilitado 
+                                                    (cod_op_semana,cod_oseccion,cod_aula,num_solicitud,distancia_maxima,tiempo_cerrar_num_solicitud) VALUES 
+                                                    (${cod_op_semana},${cod_oseccion},${cod_aula},${num_solicitud[0].num_solicitud},'${distancia_maxima}','${tiempo_cerrar_num_solicitud}')`
+                                                    );
+            res.json(response);
+        }else{
+            res.json({'response':'Hay semanas que aun no estan cerradas'});
+            
+        }*/
+        const response = await connection.query(
+                                            `INSERT INTO asistencia_habilitado 
+                                            (cod_op_semana,cod_oseccion,cod_aula,num_solicitud,distancia_maxima,tiempo_cerrar_num_solicitud) VALUES 
+                                            (${cod_op_semana},${cod_oseccion},${cod_aula},${num_solicitud[0].num_solicitud},'${distancia_maxima}','${tiempo_cerrar_num_solicitud}')`
+                                            );
         res.json(response);
     }else{
-        res.json({'response':'Hay semanas que aun no estan cerradas'});
-        
+        res.json({'response':'Esta semana ya no acepta crear asistencia, pase a la siguiente semana'});
     }
+    
+    
     // num_solicitud es un numero correlativo mayor :contador + 1 a los registros para este email,cod_oseccion y cod_op_semana
     //todos las asistencias_habilitados para el pofe y seccion deben estar desahbilitadas con 1
     
@@ -395,8 +399,7 @@ const getDocenteSeccion = async(req,res)=>{
     const response = await connection.query(`select
                                                 h.cod_oseccion,
                                                 g.cod_seccion,
-                                                g.descripcion,
-                                                k.referencia
+                                                g.descripcion
                                             FROM
                                                 orden_pedido a,
                                                 tipo_ciclo b,
@@ -407,8 +410,7 @@ const getDocenteSeccion = async(req,res)=>{
                                                 seccion g,
                                                 usuario_seccion h,
                                                 perfil i,
-                                                op_semana j,
-                                                aula k
+                                                op_semana j
                                             WHERE
                                                 a.cod_tipo_ciclo = b.cod_tipo_ciclo AND
                                                 a.cod_facultad = c.cod_facultad AND
@@ -420,7 +422,6 @@ const getDocenteSeccion = async(req,res)=>{
                                                 h.email = i.email AND
                                                 i.tipo = 2 AND
                                                 a.cod_op=j.cod_op AND
-                                                f.cod_aula = k.cod_aula AND
                                                 h.email='${email}' AND
                                                 c.cod_facultad = ${cod_facultad} AND
                                                 e.cod_curso = '${cod_curso}' AND
@@ -428,26 +429,45 @@ const getDocenteSeccion = async(req,res)=>{
 											GROUP BY
                                                 h.cod_oseccion,
                                                 g.cod_seccion,
-                                                g.descripcion,
-                                                k.referencia`);
+                                                g.descripcion`);
     //res.json({'response':response});
     res.json(response);
 }
 
 const getSemanas = async(req,res)=>{
     const connection = await database.getConnection();
-    const response = await connection.query(`select
-                                                b.cod_op_semana,
-                                                CONCAT('Semana ',b.num_semana) 'num_semana'
-                                            FROM
-                                                orden_pedido a,
-                                                op_semana b
-                                            WHERE
-                                                a.cod_op = b.cod_op AND
-                                                a.fecha_inicio<=NOW() AND a.fecha_final>=NOW() AND
-                                                b.fecha_inicio<=NOW()
-                                            ORDER BY
-                                                b.num_semana DESC`);
+    const response = await connection.query(`SELECT
+                                                c.cod_op_semana,c.num_semana
+                                            FROM 
+                                                (
+                                                    select
+                                                        b.cod_op_semana,
+                                                        CONCAT('Semana ',b.num_semana) 'num_semana'
+                                                    FROM
+                                                        orden_pedido a,
+                                                        op_semana b
+                                                    WHERE
+                                                        a.cod_op = b.cod_op AND
+                                                        a.fecha_inicio<=NOW() AND a.fecha_final>=NOW() AND
+                                                        b.fecha_inicio<=NOW() AND b.fecha_final>=NOW()
+                                                    UNION
+                                                        (
+                                                            SELECT
+                                                                b.cod_op_semana,
+                                                                CONCAT('Semana ',b.num_semana) 'num_semana'
+                                                            FROM
+                                                                orden_pedido a,
+                                                                op_semana b,
+                                                                asistencia_habilitado c
+                                                            WHERE
+                                                                a.cod_op = b.cod_op AND
+                                                                a.fecha_inicio<=NOW() AND a.fecha_final>=NOW() AND
+                                                                b.fecha_inicio<=NOW() AND
+                                                                b.cod_op_semana = c.cod_op_semana
+                                                        )
+                                                ) c
+                                                ORDER BY
+                                                    c.num_semana DESC`);
     //res.json({'response':response});
     res.json(response);
 }
@@ -462,16 +482,18 @@ const getSemanaHabilitada = async(req,res)=>{
                                                 a.distancia_maxima,
                                                 a.fecha_created,
                                                 a.habilitado,
-                                                DATE_FORMAT(DATE_ADD(a.fecha_created,interval a.tiempo_cerrar_num_solicitud minute),"%d-%m-%Y %h:%i:%s %p") 'fecha_cierre'
+                                                DATE_FORMAT(DATE_ADD(a.fecha_created,interval a.tiempo_cerrar_num_solicitud minute),"%d-%m-%Y %h:%i:%s %p") 'fecha_cierre',
+                                                a.cod_aula
                                             FROM
                                                 asistencia_habilitado a,
-                                                op_semana b
+                                                op_semana b,
+                                                usuario_seccion c
                                             WHERE
                                                 a.cod_op_semana = b.cod_op_semana AND
+                                                a.cod_oseccion = c.cod_oseccion AND
                                                 a.cod_op_semana = ${cod_op_semana} AND
                                                 a.cod_oseccion = ${cod_oseccion} AND
-                                                a.email = '${email}'# AND
-                                                #NOW() <= date_add(a.fecha_created,interval a.tiempo_cerrar_num_solicitud minute)
+                                                c.email = '${email}'
                                             ORDER BY
                                                 a.num_solicitud DESC
                                             LIMIT 1`);
@@ -496,7 +518,14 @@ const getSolicitud = async(req,res)=>{
                                                 a.cod_op_semana = b.cod_op_semana AND
                                                 a.cod_op_semana = ${cod_op_semana} AND
                                                 a.cod_oseccion = ${cod_oseccion} AND
-                                                a.email = '${email}'
+                                                EXISTS (
+                                                    SELECT
+                                                        1
+                                                    FROM
+                                                        usuario_seccion c
+                                                    WHERE
+                                                        c.cod_oseccion = ${cod_oseccion} AND
+                                                        c.email = '${email}')
                                             ORDER BY
                                                 a.num_solicitud DESC`);
     //res.json({'response':response});
@@ -545,15 +574,22 @@ const getAsistenciaClase  = async(req,res)=>{
 const putCerrarAsistencia = async(req,res)=>{
     const connection = await database.getConnection();
     const {email} = req.params;
-    const {cod_asistencia_habilitado,habilitado} = req.body;
+    const {cod_asistencia_habilitado,cod_oseccion,habilitado} = req.body;
     const response = await connection.query(
                                         `UPDATE
                                             asistencia_habilitado
                                         SET
                                             habilitado=${habilitado}
                                         WHERE
-                                            email='${email}' and
-                                            cod_asistencia_habilitado = ${cod_asistencia_habilitado}`
+                                            cod_asistencia_habilitado = ${cod_asistencia_habilitado} AND
+                                            EXISTS (
+                                                SELECT
+                                                    1
+                                                FROM
+                                                    usuario_seccion a
+                                                WHERE
+                                                    a.cod_oseccion = ${cod_oseccion} AND
+                                                    a.email = '${email}')`
                                         );
     //const users = response.json();
     //res.json({'response':[{'response':'Cerrado con éxito'}]});
@@ -563,16 +599,24 @@ const putCerrarAsistencia = async(req,res)=>{
 const putAsistencia = async(req,res)=>{
     const connection = await database.getConnection();
     const {email} = req.params;
-    const {cod_asistencia_habilitado,distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
+    const {cod_asistencia_habilitado,cod_oseccion,cod_aula,distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
     const response = await connection.query(
                                         `UPDATE
                                             asistencia_habilitado
                                         SET
                                             distancia_maxima=${distancia_maxima},
-                                            tiempo_cerrar_num_solicitud=${tiempo_cerrar_num_solicitud}
+                                            tiempo_cerrar_num_solicitud=${tiempo_cerrar_num_solicitud},
+                                            cod_aula='${cod_aula}'
                                         WHERE
-                                            email='${email}' and
-                                            cod_asistencia_habilitado = ${cod_asistencia_habilitado}`
+                                            cod_asistencia_habilitado = ${cod_asistencia_habilitado} AND
+                                            EXISTS (
+                                                SELECT
+                                                    1
+                                                FROM
+                                                    usuario_seccion a
+                                                WHERE
+                                                    a.cod_oseccion = ${cod_oseccion} AND
+                                                    a.email = '${email}')`
                                         );
     //const users = response.json();
     res.json(response);
@@ -670,7 +714,26 @@ const getDocenteSemanaHabilitada = async(req,res)=>{
 }
 
 
-
+const getAula  = async(req,res)=>{
+    const connection = await database.getConnection();
+    const {cod_facultad} = req.params;
+    const response = await connection.query(
+                                            `SELECT
+                                                a.cod_aula,
+                                                a.latitud,
+                                                a.longitud,
+                                                a.referencia,
+                                                b.descripcion
+                                            FROM
+                                                aula a,
+                                                facultad b
+                                            WHERE
+                                                a.cod_facultad = b.cod_facultad AND
+                                                a.cod_facultad = ${cod_facultad}`
+                                            );
+    //res.json({'response':response});
+    res.json(response);
+};
 
 
 const methods = {
@@ -694,7 +757,8 @@ const methods = {
     getDocenteSemanaHabilitada,
     getAsistenciaClase,
     putCerrarAsistencia,
-    putAsistencia
+    putAsistencia,
+    getAula
 };
 
 module.exports = methods;
