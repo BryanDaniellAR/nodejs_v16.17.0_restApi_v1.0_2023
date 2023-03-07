@@ -1,7 +1,8 @@
 const database= require('../database/database');
+const mysql = require('promise-mysql');
 
 const getAllClasesCiclo  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const response = await connection.query(
                                             `select 
                                                 a.descripcion 'Ciclo',
@@ -31,7 +32,7 @@ const getAllClasesCiclo  = async(req,res)=>{
     res.json(response);
 };
 const getClasesDocenteSemana  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(
                                             `select
@@ -76,7 +77,7 @@ const getClasesDocenteSemana  = async(req,res)=>{
     res.json({'response':response});
 };
 const getClasesDocenteSemanaReporte  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(
                                             `select
@@ -121,7 +122,7 @@ const getClasesDocenteSemanaReporte  = async(req,res)=>{
     res.json(response);
 };
 const postHabilitarClaseSemana = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op_semana,cod_oseccion,cod_aula,distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
     const num_solicitud = await connection.query(
                                             `SELECT
@@ -182,7 +183,7 @@ const postHabilitarClaseSemana = async(req,res)=>{
     
 }
 const getExisteAsistenciaSemanaHabilitado  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_facultad,cod_curso,cod_seccion,cod_op_semana} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -207,7 +208,7 @@ const getExisteAsistenciaSemanaHabilitado  = async(req,res)=>{
 };
 
 const putCerrarClases = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const {cod_oseccion,cod_op_semana} = req.body;
     const response = await connection.query(
@@ -225,7 +226,7 @@ const putCerrarClases = async(req,res)=>{
 }
 
 const getClase = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion,cod_op_semana} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -254,7 +255,7 @@ const getClase = async(req,res)=>{
     }
 }
 const putClase = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_asistencia_habilitado} = req.params;
     const {distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
     const response = await connection.query(
@@ -281,7 +282,7 @@ const putClase = async(req,res)=>{
 }
 
 const getClaseReporte = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion,cod_op_semana,num_solicitud} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -319,7 +320,7 @@ const getClaseReporte = async(req,res)=>{
 }
 
 const getDocenteFacultad = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(`select
                                                 c.cod_facultad,
@@ -357,7 +358,7 @@ const getDocenteFacultad = async(req,res)=>{
     res.json(response);
 }
 const getDocenteCurso = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_facultad} = req.params;
     const response = await connection.query(`select
                                                 e.cod_curso,
@@ -394,7 +395,7 @@ const getDocenteCurso = async(req,res)=>{
     res.json(response);
 }
 const getDocenteSeccion = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_facultad,cod_curso} = req.params;
     const response = await connection.query(`select
                                                 h.cod_oseccion,
@@ -435,7 +436,7 @@ const getDocenteSeccion = async(req,res)=>{
 }
 
 const getSemanas = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const response = await connection.query(`SELECT
                                                 c.cod_op_semana,c.num_semana
                                             FROM 
@@ -473,7 +474,7 @@ const getSemanas = async(req,res)=>{
 }
 
 const getSemanaHabilitada = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion,cod_op_semana} = req.params;
     const response = await connection.query(`SELECT
                                                 a.cod_asistencia_habilitado,
@@ -502,7 +503,7 @@ const getSemanaHabilitada = async(req,res)=>{
 }
 
 const getSolicitud = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion,cod_op_semana} = req.params;
     await connection.query(`SET lc_time_names = 'es_PE'`);
     const response = await connection.query(`SELECT
@@ -533,7 +534,7 @@ const getSolicitud = async(req,res)=>{
 }
 
 const getAsistenciaClase  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_oseccion,cod_asistencia_habilitado} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -572,7 +573,7 @@ const getAsistenciaClase  = async(req,res)=>{
 };
 
 const putCerrarAsistencia = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const {cod_asistencia_habilitado,cod_oseccion,habilitado} = req.body;
     const response = await connection.query(
@@ -597,7 +598,7 @@ const putCerrarAsistencia = async(req,res)=>{
 };
 
 const putAsistencia = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const {cod_asistencia_habilitado,cod_oseccion,cod_aula,distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
     const response = await connection.query(
@@ -623,7 +624,7 @@ const putAsistencia = async(req,res)=>{
 };
 
 const getDocenteSemana = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_facultad,cod_curso,cod_seccion} = req.params;
     const response = await connection.query(`select
                                                 j.cod_op_semana,
@@ -661,7 +662,7 @@ const getDocenteSemana = async(req,res)=>{
     res.json({'response':response});
 }
 const getDocenteSemanaHabilitada = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion,cod_op_semana} = req.params;
     const response = await connection.query(`select
                                                 k.cod_asistencia_habilitado,
@@ -715,7 +716,7 @@ const getDocenteSemanaHabilitada = async(req,res)=>{
 
 
 const getAula  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_facultad} = req.params;
     const response = await connection.query(
                                             `SELECT

@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getUsuarioAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -17,7 +18,7 @@ const getUsuarioAll  = async(req,res)=>{
     res.json(response);
 };
 const getUsuarioFaltante  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -41,7 +42,7 @@ const getUsuarioFaltante  = async(req,res)=>{
     res.json(response);
 };
 const getUsuario  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -60,7 +61,7 @@ const getUsuario  = async(req,res)=>{
 };
 
 const postUsuario  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     console.log(req.body);
     const {email,password} = req.body;
     const response = await connection.query(
@@ -71,7 +72,7 @@ const postUsuario  = async(req,res)=>{
     res.json(response);
 };
 const putUsuario = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const {password,token} = req.body;
     try{
@@ -93,7 +94,7 @@ const putUsuario = async(req,res)=>{
     }
 };
 const deleteUsuario  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     try{
         const response = await connection.query(

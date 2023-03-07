@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getRolAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -15,7 +16,7 @@ const getRolAll  = async(req,res)=>{
     res.json(response);
 };
 const getRol  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {tipo} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -31,7 +32,7 @@ const getRol  = async(req,res)=>{
     res.json(response);
 };
 const postRol  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {tipo,descripcion} = req.body;
     const response = await connection.query(
                                             `INSERT INTO
@@ -41,7 +42,7 @@ const postRol  = async(req,res)=>{
     res.json(response);
 };
 const putRol = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {tipo} = req.params;
     const {descripcion} = req.body;
     try{
@@ -62,7 +63,7 @@ const putRol = async(req,res)=>{
     }
 };
 const deleteRol  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {tipo} = req.params;
     try{
         const response = await connection.query(

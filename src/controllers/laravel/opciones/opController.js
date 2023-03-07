@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getOPAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -28,7 +29,7 @@ const getOPAll  = async(req,res)=>{
     res.json(response);
 };
 const getOPOSemana  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -48,7 +49,7 @@ const getOPOSemana  = async(req,res)=>{
     res.json(response);
 };
 const getOPCursoDisponible  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -75,7 +76,7 @@ const getOPCursoDisponible  = async(req,res)=>{
     res.json(response);
 };
 const getOPAula  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -103,7 +104,7 @@ const getOPAula  = async(req,res)=>{
     res.json(response);
 };
 const getOPOCurso  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -126,7 +127,7 @@ const getOPOCurso  = async(req,res)=>{
     res.json(response);
 };
 const getOP  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -152,7 +153,7 @@ const getOP  = async(req,res)=>{
     res.json(response);
 };
 const postOP  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_facultad,cod_tipo_ciclo,descripcion,fecha_inicio,fecha_final} = req.body;
     const response = await connection.query(
                                             `INSERT INTO
@@ -162,7 +163,7 @@ const postOP  = async(req,res)=>{
     res.json(response);
 };
 const putOP = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op} = req.params;
     const {cod_tipo_ciclo,descripcion,fecha_inicio,fecha_final} = req.body;
     try{
@@ -186,7 +187,7 @@ const putOP = async(req,res)=>{
     }
 };
 const deleteOP  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op} = req.params;
     try{
         const response = await connection.query(

@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getCursoAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -20,7 +21,7 @@ const getCursoAll  = async(req,res)=>{
 };
 
 const getCurso  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_curso} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -39,7 +40,7 @@ const getCurso  = async(req,res)=>{
     res.json(response);
 };
 const postCurso  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_curso,descripcion,cod_facultad} = req.body;
     const response = await connection.query(
                                             `INSERT INTO
@@ -49,7 +50,7 @@ const postCurso  = async(req,res)=>{
     res.json(response);
 };
 const putCurso = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_curso} = req.params;
     const {descripcion,cod_facultad} = req.body;
     try{
@@ -71,7 +72,7 @@ const putCurso = async(req,res)=>{
     }
 };
 const deleteCurso  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_curso} = req.params;
     try{
         const response = await connection.query(

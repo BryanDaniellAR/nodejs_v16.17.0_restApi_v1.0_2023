@@ -1,13 +1,14 @@
 const database= require('../database/database');
+const mysql = require('promise-mysql');
 
 const getAllUsuario  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const response = await connection.query(`SELECT email,password,token from usuario`);
     //const users = response.json();
     res.json(response);
 };
 const getUsuario  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(`SELECT 
                                                 a.email,
@@ -44,7 +45,7 @@ const getUsuario  = async(req,res)=>{
     res.json(response);
 };
 const putUsuario  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const {password} = req.body;
     const response = await connection.query(`UPDATE usuario SET password='${password}' where email = '${email}'`);

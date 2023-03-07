@@ -1,24 +1,24 @@
-const database= require('../../../database/database');
+const database = require('../../../database/database');
+const mysql = require('promise-mysql');
 
-const getFacultadAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+const getFacultadAll  = async (req,res)=>{
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
-                                            `SELECT
-                                                cod_facultad,
-                                                descripcion,
-                                                abreviatura
-                                            FROM
-                                                facultad
-                                            ORDER BY
-                                                descripcion ASC`
-                                            );
-    //let result = Object.values(JSON.parse(JSON.stringify(response)));
+                                `SELECT
+                                    cod_facultad,
+                                    descripcion,
+                                    abreviatura
+                                FROM
+                                    facultad
+                                ORDER BY
+                                    descripcion ASC`);
+                        //let result = Object.values(JSON.parse(JSON.stringify(response)));
     //console.log(result);
     res.json(response);
 };
 const getFacultadCurso  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_facultad} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -37,7 +37,7 @@ const getFacultadCurso  = async(req,res)=>{
     res.json(response);
 };
 const getFacultad  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_facultad} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -54,7 +54,7 @@ const getFacultad  = async(req,res)=>{
     res.json(response);
 };
 const postFacultad  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {descripcion,abreviatura} = req.body;
     const response = await connection.query(
                                             `INSERT INTO
@@ -64,7 +64,7 @@ const postFacultad  = async(req,res)=>{
     res.json(response);
 };
 const putFacultad = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_facultad} = req.params;
     const {descripcion,abreviatura} = req.body;
     try{
@@ -86,7 +86,7 @@ const putFacultad = async(req,res)=>{
     }
 };
 const deleteFacultad  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_facultad} = req.params;
     try{
         const response = await connection.query(

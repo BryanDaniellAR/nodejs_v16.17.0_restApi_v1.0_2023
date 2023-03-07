@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getOSemanaAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -28,7 +29,7 @@ const getOSemanaAll  = async(req,res)=>{
     res.json(response);
 };
 const getOSemanaSeccionCursoFacultadOP  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_seccion,cod_op_semana,cod_curso,cod_op} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -54,7 +55,7 @@ const getOSemanaSeccionCursoFacultadOP  = async(req,res)=>{
     res.json(response);
 };
 const getOSemana  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op_semana} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -80,7 +81,7 @@ const getOSemana  = async(req,res)=>{
     res.json(response);
 };
 const postOSemana  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op,fecha_inicio,fecha_final} = req.body;
     const num_semana = await connection.query(
                                             `SELECT
@@ -134,7 +135,7 @@ const postOSemana  = async(req,res)=>{
     
 };
 const putOSemana = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op_semana} = req.params;
     const {fecha_inicio,fecha_final} = req.body;
     const num_semana = await connection.query(`SELECT
@@ -266,7 +267,7 @@ const putOSemana = async(req,res)=>{
     
 };
 const deleteOSemana  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op_semana} = req.params;
     const validar_op_semana = await connection.query(
                                                     `SELECT

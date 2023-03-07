@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getPerfilAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -27,7 +28,7 @@ const getPerfilAll  = async(req,res)=>{
     res.json(response);
 };
 const getPerfilDocente  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const response = await connection.query(
                                             `SELECT
                                                 a.codigo,
@@ -53,7 +54,7 @@ const getPerfilDocente  = async(req,res)=>{
     res.json(response);
 };
 const getPerfilAlumno  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const response = await connection.query(
                                             `SELECT
                                                 a.codigo,
@@ -79,7 +80,7 @@ const getPerfilAlumno  = async(req,res)=>{
     res.json(response);
 };
 const getPerfil  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {codigo} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -106,7 +107,7 @@ const getPerfil  = async(req,res)=>{
     res.json(response);
 };
 const postPerfil  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     console.log(req.body);
     const {codigo,primer_nombre,segundo_nombre,tercer_nombre,apellido_paterno,apellido_materno,tipo,email} = req.body;
     const response = await connection.query(
@@ -117,7 +118,7 @@ const postPerfil  = async(req,res)=>{
     res.json(response);
 };
 const putPerfil = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {codigo} = req.params;
     const {primer_nombre,segundo_nombre,tercer_nombre,apellido_paterno,apellido_materno,tipo,email} = req.body;
     try{
@@ -144,7 +145,7 @@ const putPerfil = async(req,res)=>{
     }
 };
 const deletePerfil  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {codigo} = req.params;
     try{
         const response = await connection.query(

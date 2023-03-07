@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getAsistenciaHabilitadoAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -62,7 +63,7 @@ const getAsistenciaHabilitadoAll  = async(req,res)=>{
     res.json(response);
 };
 const getAsistenciaHabilitado  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_asistencia_habilitado} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -122,7 +123,7 @@ const getAsistenciaHabilitado  = async(req,res)=>{
     res.json(response);
 };
 const postAsistenciaHabilitado  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_op_semana,cod_oseccion,cod_aula,distancia_maxima,tiempo_cerrar_num_solicitud} = req.body;
     const num_solicitud = await connection.query(
                                             `SELECT
@@ -171,7 +172,7 @@ const postAsistenciaHabilitado  = async(req,res)=>{
     
 };
 const putAsistenciaHabilitado = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_asistencia_habilitado} = req.params;
     const {distancia_maxima,tiempo_cerrar_num_solicitud,habilitado} = req.body;
     
@@ -217,7 +218,7 @@ const putAsistenciaHabilitado = async(req,res)=>{
     }
 };
 const deleteAsistenciaHabilitado  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_asistencia_habilitado} = req.params;
     try{
         const response = await connection.query(

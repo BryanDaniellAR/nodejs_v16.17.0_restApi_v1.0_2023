@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getUsuarioSeccionAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -37,7 +38,7 @@ const getUsuarioSeccionAll  = async(req,res)=>{
     res.json(response);
 };
 const getUsuarioSeccionEmail  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {id} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -68,7 +69,7 @@ const getUsuarioSeccionEmail  = async(req,res)=>{
     res.json(response);
 };
 const getUsuarioSeccion  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {id} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -105,7 +106,7 @@ const getUsuarioSeccion  = async(req,res)=>{
     res.json(response);
 };
 const postUsuarioSeccion  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion} = req.body;
     const response = await connection.query(
                                             `INSERT INTO
@@ -115,7 +116,7 @@ const postUsuarioSeccion  = async(req,res)=>{
     res.json(response);
 };
 const putUsuarioSeccion = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {id} = req.params;
     const {email} = req.body;
     try{
@@ -136,7 +137,7 @@ const putUsuarioSeccion = async(req,res)=>{
     }
 };
 const deleteUsuarioSeccion  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {id} = req.params;
     try{
         const response = await connection.query(

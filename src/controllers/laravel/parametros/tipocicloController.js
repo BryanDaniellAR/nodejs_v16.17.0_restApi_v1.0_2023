@@ -1,7 +1,8 @@
 const database= require('../../../database/database');
+const mysql = require('promise-mysql');
 
 const getTipoCicloAll  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -17,7 +18,7 @@ const getTipoCicloAll  = async(req,res)=>{
     res.json(response);
 };
 const getTipoCiclo  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_tipo_ciclo} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -33,7 +34,7 @@ const getTipoCiclo  = async(req,res)=>{
     res.json(response);
 };
 const postTipoCiclo  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {semanas} = req.body;
     const response = await connection.query(
                                             `INSERT INTO
@@ -43,7 +44,7 @@ const postTipoCiclo  = async(req,res)=>{
     res.json(response);
 };
 const putTipoCiclo = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_tipo_ciclo} = req.params;
     const {semanas} = req.body;
     try{
@@ -64,7 +65,7 @@ const putTipoCiclo = async(req,res)=>{
     }
 };
 const deleteTipoCiclo  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {cod_tipo_ciclo} = req.params;
     try{
         const response = await connection.query(

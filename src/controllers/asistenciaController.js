@@ -1,7 +1,8 @@
 const database= require('../database/database');
+const mysql = require('promise-mysql');
 
 const getCursosAlumno  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -23,7 +24,7 @@ const getCursosAlumno  = async(req,res)=>{
 };
 
 const getAsistenciaHoy  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -66,7 +67,7 @@ const getAsistenciaHoy  = async(req,res)=>{
 };
 
 const getAsistenciaHabilitada  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -108,7 +109,7 @@ const getAsistenciaHabilitada  = async(req,res)=>{
 };
 
 const getOpcionesAsistencia  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -154,7 +155,7 @@ const getOpcionesAsistencia  = async(req,res)=>{
 
 
 const postAsistencia = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email,cod_oseccion,cod_asistencia_habilitado,distancia,cod_op_semana} = req.body;
     const asistencia_habilitado = await connection.query(
                                                         `SELECT
@@ -247,7 +248,7 @@ const postAsistencia = async(req,res)=>{
 }
 
 const getLastAsistencia  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     const {email} = req.params;
     const response = await connection.query(
                                             `SELECT
@@ -284,7 +285,7 @@ const getLastAsistencia  = async(req,res)=>{
 
 
 const postAsistenciaHabilitada = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const {cod_op_semana,cod_oseccion,distancia_maxima,tiempo_cerrar_num_solicitud,email} = req.body;
     const response_ = await connection.query(`SELECT
@@ -337,7 +338,7 @@ const postAsistenciaHabilitada = async(req,res)=>{
 };
 
 const postAsistenciaAlumno  = async(req,res)=>{
-    const connection = await database.getConnection();
+    const connection = await mysql.createConnection(database);
     //const {email} = req.params;
     const {cod_op_semana,email,cod_oseccion,cod_asistencia_habilitado,distancia} = req.body;
     const response_ = await connection.query(`SELECT
